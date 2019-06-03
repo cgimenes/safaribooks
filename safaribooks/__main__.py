@@ -60,6 +60,48 @@ def download(args):
     convert_to_mobi(args)
 
 
+def download_playlist_epub(args):
+    if not args.user and not args.cookie:
+        raise ValueError('argument -u/--user or -c/--cookie is required for downloading')
+    if not args.password and args.user:
+        raise ValueError('argument -p/--password with -u/--user or -c/--cookie is required for downloading')
+    if args.password and not args.user:
+        raise ValueError('argument -u/--user with -p/--password or -c/--cookie is required for downloading')
+    if not args.playlist_id:
+        raise ValueError('argument -P/--playlist-id is required for downloading')
+
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(
+        'SafariBooksPlaylist',
+        user=args.user,
+        password=args.password,
+        cookie=args.cookie,
+        playlistid=args.playlist_id
+    )
+    process.start()
+
+
+def download_playlist(args):
+    if not args.user and not args.cookie:
+        raise ValueError('argument -u/--user or -c/--cookie is required for downloading')
+    if not args.password and args.user:
+        raise ValueError('argument -p/--password with -u/--user or -c/--cookie is required for downloading')
+    if args.password and not args.user:
+        raise ValueError('argument -u/--user with -p/--password or -c/--cookie is required for downloading')
+    if not args.playlist_id:
+        raise ValueError('argument -P/--playlist-id is required for downloading')
+
+    process = CrawlerProcess(get_project_settings())
+    process.crawl(
+        'SafariBooksPlaylist',
+        user=args.user,
+        password=args.password,
+        cookie=args.cookie,
+        playlistid=args.playlist_id
+    )
+    process.start()
+
+
 parser = argparse.ArgumentParser(
     description='Crawl Safari Books Online book content',
 )
@@ -89,6 +131,11 @@ parser.add_argument(
     '--cookie',
     help='Safari Books Online SSO cookie',
 )
+parser.add_argument(
+    '-P',
+    '--playlist-id',
+    help='Safari Books Online playlist ID',
+)
 
 subparsers = parser.add_subparsers()
 
@@ -103,6 +150,18 @@ download_parser = subparsers.add_parser(
     help='Download as epub, and convert to mobi',
 )
 download_parser.set_defaults(func=download)
+
+download_playlist_parser = subparsers.add_parser(
+    'download-playlist',
+    help='Download as epub, and convert to mobi an entire playlist',
+)
+download_playlist_parser.set_defaults(func=download_playlist)
+
+download_playlist_epub_parser = subparsers.add_parser(
+    'download-playlist-epub',
+    help='Download as epub an entire playlist',
+)
+download_playlist_epub_parser.set_defaults(func=download_playlist_epub)
 
 convert_to_mobi_parser = subparsers.add_parser(
     'convert-to-mobi',
